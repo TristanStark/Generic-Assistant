@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  rag-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-api
+    ports:
+      - "5000:5000"
+    environment:
+      - OPENAI_API_KEY=sk-xxx  # Remplace avec ta clé ou monte un .env
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

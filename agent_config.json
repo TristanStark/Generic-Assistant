@@ -1,0 +1,25 @@
+{
+    "name": "test_import",
+    "description": "Test import of agent configuration",
+    "llm_model": "gpt-4.1-nano",
+    "faiss_database": [
+        {
+            "name": "notes",
+            "read_sql_command": "SELECT id, content FROM notes",
+            "encoder_type": "text",
+            "table_schema_sql": null
+        },
+        {
+            "name": "image_descriptions",
+            "read_sql_command": "SELECT id, description FROM image_descriptions",
+            "encoder_type": "text",
+            "table_schema_sql": null
+        },
+        {
+            "name": "image_embeddings",
+            "read_sql_command": "SELECT id, filepath FROM image_embeddings",
+            "encoder_type": "image",
+            "table_schema_sql": null
+        }
+    ]
+}

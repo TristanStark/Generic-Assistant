@@ -1,0 +1,146 @@
+openapi: 3.0.3
+info:
+  title: QueryAgent API
+  description: >
+    API Flask permettant d’ajouter des données à différents agents FAISS
+    et d’effectuer des requêtes contextuelles.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Serveur local
+
+paths:
+  /add_data/{db_name}:
+    post:
+      summary: Ajouter des données dans une base spécifique d’un agent
+      parameters:
+        - name: db_name
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [notes, images]
+          description: Nom de la base cible (ex. `notes` ou `images`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/NotePayload'
+                - $ref: '#/components/schemas/ImagePayload'
+      responses:
+        '200':
+          description: Donnée insérée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  db:
+                    type: string
+                    example: notes
+        '400':
+          description: Erreur lors de l’ajout de la donnée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /query:
+    post:
+      summary: Interroger un agent avec une question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+              required:
+                - question
+            example:
+              question: Quelle est la dernière note enregistrée ?
+      responses:
+        '200':
+          description: Réponse générée par l'agent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: Voici votre dernière note...
+        '400':
+          description: Erreur d'entrée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health:
+    get:
+      summary: Vérifie que l’API est en ligne
+      description: Retourne un statut simple indiquant si l’API est vivante.
+      responses:
+        '200':
+          description: API en ligne
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          description: Erreur interne
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    NotePayload:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Ceci est ma note personnelle.
+      required:
+        - text
+
+    ImagePayload:
+      type: object
+      properties:
+        image_base64:
+          type: string
+          format: byte
+          description: Image encodée en base64
+        filename:
+          type: string
+          example: image_test.jpg
+      required:
+        - image_base64
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: string
+          example: "Missing 'text' field"
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, initializing]
+          example: ok

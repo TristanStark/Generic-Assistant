@@ -1,0 +1,10 @@
+flask
+openai
+langchain
+langchain-community
+langchain-openai
+langchain-text-splitters
+Pillow
+torch
+transformers
+faiss-cpu
